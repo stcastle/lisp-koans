@@ -50,8 +50,24 @@
 ; Your goal is to write the score method.
 
 (defun score (dice)
-  ; You need to write this method
-)
+  (let ((roll-count))
+    (setf roll-count (make-hash-table :test #'equal))
+    (dolist (x dice)
+	 (if (equal nil (gethash x roll-count))
+	     (setf (gethash x roll-count) 1)
+	     (incf (gethash x roll-count))))
+    (let ((score 0))
+      (loop for roll being the hash-keys in roll-count
+	 using (hash-value count)
+	   do
+	   (cond
+	     ((= roll 1)
+	      (setf score (+ score (* 1000 (floor count 3)) (* 100 (mod count 3)))))
+	      (t
+	       (when (= roll 5)
+		 (setf score (+ score (* 50 (mod count 3)))))
+	       (setf score (+ score (* 100 roll (floor count 3)))))))
+      score)))
 
 (define-test test-score-of-an-empty-list-is-zero
     (assert-equal 0 (score nil)))
