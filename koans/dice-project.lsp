@@ -22,16 +22,28 @@
 
 ;;  YOU WRITE THIS PART:
 (defclass dice-set ()
-  () ;; WRITE DICE-SET CLASS BODY HERE
+  ((values :reader get-values :initform '()) ;; WRITE DICE-SET CLASS BODY HERE
+   (num-dice :reader get-num-dice :writer set-num-dice :initform 0))
 )
 
-(defmethod get-values ((object dice-set))
+;; (defmethod get-values ((object dice-set))
   ;; WRITE GET-VALUES METHOD DEFINITION HERE
-)
+  ;; This is auto-generated.
+;; )
 
 (defmethod roll (how-many (object dice-set))
-  ;; WRITE ROLL METHOD DEFINITION HERE
-)
+  (set-num-dice how-many object)
+  (let* ((old-values (get-values object))
+	(len (length old-values))
+	(loop-result
+	     (loop for i from 0 to (- how-many 1)
+		collect
+		  (if (< i len)
+		      ;; Use old values to avoid repeat dice rolls.
+		      (+ 1 (mod (+ i (nth i old-values)) 6))
+		      ;; If no old values, just use (i mod 6) + 1 as roll.
+		      (+ 1 (mod i 6))))))
+    (setf (slot-value object 'values) loop-result)))
 
 
 (define-test test-create-dice-set
